@@ -13,5 +13,7 @@ public class kari extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.kari_main);
 
+        SetUpPieChart mSetUpPieChart = new SetUpPieChart();
+        
     }
 }
