@@ -34,4 +34,13 @@
         android:text="ログアウト"
         android:textColor="@color/colorButtonText"/>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Topへ戻る"
+        android:id="@+id/BackToTopButton"
+        android:background="@drawable/custom_button"
+        android:textColor="@color/colorButtonText" />
+
 </LinearLayout>
