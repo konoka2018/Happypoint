@@ -2,6 +2,7 @@ package jp.kf.happypoint;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -33,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText mPasswordEditText; //作成ボタンをタップしたときに入力されている文字列を取得するため。
     EditText mNameEditText;     //作成ボタンをタップしたときに入力されている文字列を取得するため。
     ProgressDialog mProgress;   //ログイン、アカウント作成中はプログレスダイアログを表示。
+    Intent mIntent;
 
     //firebase関連クラスとリスナー読み込み。
     FirebaseAuth mAuth;
@@ -194,7 +196,9 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-    }
+
+
+    }//oncreate last
 
     private void createAccount(String email, String password) {
         // プログレスダイアログを表示する
@@ -220,4 +224,4 @@ public class LoginActivity extends AppCompatActivity {
         editor.commit();
     }
 
-}
+}//class last

@@ -1,6 +1,7 @@
 package jp.kf.happypoint;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -24,6 +25,7 @@ public class SettingActivity extends AppCompatActivity {
 
     DatabaseReference mDataBaseReference;
     private EditText mNameText;
+    Intent mIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,5 +85,19 @@ public class SettingActivity extends AppCompatActivity {
                 Snackbar.make(v, "ログアウトしました", Snackbar.LENGTH_LONG).show();
             }
         });
-    }
-}
+
+        /**
+         ログイン画面へ遷移（ログイン画面へ遷移)
+         **/
+        Button mButton_backtotop = (Button) findViewById(R.id.BackToTopButton);
+        mButton_backtotop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                mIntent = new Intent(getApplication(), MainActivity.class);
+                startActivity(mIntent);
+            }
+        });
+    }//oncreate last
+
+}//class last
