@@ -3,9 +3,7 @@ package jp.kf.happypoint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -25,35 +23,28 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
     EditText mEmailEditText;    //作成ボタンをタップしたときに入力されている文字列を取得するため。
     EditText mPasswordEditText; //作成ボタンをタップしたときに入力されている文字列を取得するため。
-    EditText mNameEditText;     //作成ボタンをタップしたときに入力されている文字列を取得するため。
     ProgressDialog mProgress;   //ログイン、アカウント作成中はプログレスダイアログを表示。
     Intent mIntent;
 
     //firebase関連クラスとリスナー読み込み。
     FirebaseAuth mAuth;
-    OnCompleteListener<AuthResult> mCreateAccountListener;  //処理の完了を受け取るリスナークラス
     OnCompleteListener<AuthResult> mLoginListener;          //処理の完了を受け取るリスナークラス
     DatabaseReference mDataBaseReference;
-
-    // アカウント作成時にフラグを立て、ログイン処理後に名前をFirebaseに保存する
-    boolean mIsCreateAccount = false;
 
     /**
      onCreateメソッドでは以下の処理を実装します。
         ・データベースへのリファレンスを取得
         ・FirebaseAuthクラスのインスタンスを取得
-        ・アカウント作成処理のリスナーを作成
         ・ログイン処理のリスナーを作成
         ・タイトルバーのタイトルを変更
         ・UIをメンバ変数に保持
-        ・アカウント作成ボタンとログインボタンのOnClickListenerを設定
+        ・ログインボタンのOnClickListenerを設定
      **/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,29 +57,6 @@ public class LoginActivity extends AppCompatActivity {
         // FirebaseAuthのオブジェクトを取得する
         mAuth = FirebaseAuth.getInstance();
 
-        // アカウント作成処理のリスナー
-        mCreateAccountListener = new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    // 成功した場合
-                    // ログインを行う
-                    String email = mEmailEditText.getText().toString();
-                    String password = mPasswordEditText.getText().toString();
-                    login(email, password);
-                } else {
-
-                    // 失敗した場合
-                    // エラーを表示する
-                    View view = findViewById(android.R.id.content);
-                    Snackbar.make(view, "アカウント作成に失敗しました", Snackbar.LENGTH_LONG).show();
-
-                    // プログレスダイアログを非表示にする
-                    mProgress.dismiss();
-                }
-            }
-        };
-
         // ログイン処理のリスナー
         mLoginListener = new OnCompleteListener<AuthResult>() {
             @Override
@@ -99,34 +67,24 @@ public class LoginActivity extends AppCompatActivity {
                     FirebaseUser user = mAuth.getCurrentUser();
                     DatabaseReference userRef = mDataBaseReference.child(Const.UsersPATH).child(user.getUid());
 
-                    if (mIsCreateAccount) {
-                        // アカウント作成の時は表示名をFirebaseに保存する
-                        String name = mNameEditText.getText().toString();
-
-                        Map<String, String> data = new HashMap<String, String>();
-                        data.put("name", name);
-                        userRef.setValue(data);
-
-                        // 表示名をPrefarenceに保存する
-                        saveName(name);
-                    } else {
                         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot snapshot) {
                                 Map data = (Map) snapshot.getValue();
-                                saveName((String)data.get("name"));
                             }
                             @Override
                             public void onCancelled(DatabaseError firebaseError) {
                             }
                         });
-                    }
 
                     // プログレスダイアログを非表示にする
                     mProgress.dismiss();
 
                     // Activityを閉じる
                     finish();
+
+                    mIntent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(mIntent);
 
                 } else {
                     // 失敗した場合
@@ -141,38 +99,13 @@ public class LoginActivity extends AppCompatActivity {
         };
 
         // UIの準備
-        setTitle("ログイン");
+        setTitle("Welcome !! Plz login");
 
         mEmailEditText = (EditText) findViewById(R.id.emailText);
         mPasswordEditText = (EditText) findViewById(R.id.passwordText);
-        mNameEditText = (EditText) findViewById(R.id.nameText);
 
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("処理中...");
-
-        Button createButton = (Button) findViewById(R.id.createButton);
-        createButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // キーボードが出てたら閉じる
-                InputMethodManager im = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                im.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-
-                String email = mEmailEditText.getText().toString();
-                String password = mPasswordEditText.getText().toString();
-                String name = mNameEditText.getText().toString();
-
-                if (email.length() != 0 && password.length() >= 6 && name.length() != 0) {
-                    // ログイン時に表示名を保存するようにフラグを立てる
-                    mIsCreateAccount = true;
-
-                    createAccount(email, password);
-                } else {
-                    // エラーを表示する
-                    Snackbar.make(v, "正しく入力してください", Snackbar.LENGTH_LONG).show();
-                }
-            }
-        });
 
         Button loginButton = (Button) findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -186,27 +119,20 @@ public class LoginActivity extends AppCompatActivity {
                 String password = mPasswordEditText.getText().toString();
 
                 if (email.length() != 0 && password.length() >= 6) {
-                    // フラグを落としておく
-                    mIsCreateAccount = false;
 
                     login(email, password);
+
                 } else {
                     // エラーを表示する
                     Snackbar.make(v, "正しく入力してください", Snackbar.LENGTH_LONG).show();
                 }
+
             }
         });
 
 
     }//oncreate last
 
-    private void createAccount(String email, String password) {
-        // プログレスダイアログを表示する
-        mProgress.show();
-
-        // アカウントを作成する
-        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(mCreateAccountListener);
-    }
 
     private void login(String email, String password) {
         // プログレスダイアログを表示する
@@ -214,14 +140,6 @@ public class LoginActivity extends AppCompatActivity {
 
         // ログインする
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(mLoginListener);
-    }
-
-    private void saveName(String name) {
-        // Preferenceに保存する
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putString(Const.NameKEY, name);
-        editor.commit();
     }
 
 }//class last
