@@ -25,23 +25,6 @@ public class MainActivity extends AppCompatActivity {
         mSetUpPieChart = new SetUpPieChart();
         mSetUpPieChart.setupPieChart(this);
 
-    /**
-     ログイン画面へ遷移（ログイン画面へ遷移)
-     **/
-    Button mButton_login = (Button) findViewById(R.id.button_login);
-        mButton_login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-                    // ログインしていなければログイン画面に遷移させる
-                    if (user == null) {
-                        mIntent = new Intent(getApplicationContext(), LoginActivity.class);
-                        startActivity(mIntent);
-                    }
-            }
-        });
     } //onCreate last
 
 

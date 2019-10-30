@@ -81,8 +81,13 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 FirebaseAuth.getInstance().signOut();
-                mNameText.setText("");
-                Snackbar.make(v, "ログアウトしました", Snackbar.LENGTH_LONG).show();
+
+//                mNameText.setText("");
+//                Snackbar.make(v, "ログアウトしました", Snackbar.LENGTH_LONG).show();
+
+                  mIntent = new Intent(getApplication(), LoginActivity.class);
+                  startActivity(mIntent);
+
             }
         });
 
