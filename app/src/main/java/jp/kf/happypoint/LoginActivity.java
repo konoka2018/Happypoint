@@ -4,11 +4,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -36,6 +39,18 @@ public class LoginActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     OnCompleteListener<AuthResult> mLoginListener;          //処理の完了を受け取るリスナークラス
     DatabaseReference mDataBaseReference;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        if(user != null){
+            mIntent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(mIntent);
+        }
+    }
 
     /**
      onCreateメソッドでは以下の処理を実装します。
@@ -132,8 +147,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     }//oncreate last
-
-
+    
     private void login(String email, String password) {
         // プログレスダイアログを表示する
         mProgress.show();
