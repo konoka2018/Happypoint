@@ -145,6 +145,16 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        Button createButton = (Button) findViewById(R.id.createButton);
+        createButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mIntent = new Intent(getApplicationContext(), CreateAccountActivity.class);
+                startActivity(mIntent);
+
+            }
+        });
 
     }//oncreate last
     
